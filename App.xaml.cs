@@ -45,6 +45,10 @@ public partial class App : System.Windows.Application
         _settings = AppSettings.Load();
         _oauth = new OAuthService(_settings);
 
+        // Reconcile the Windows "launch at login" entry with the setting on every launch, so the
+        // app registers (or unregisters) itself — and self-heals if the exe has moved.
+        StartupManager.Apply(_settings.RunAtStartup);
+
         SetupTray();
 
         _manager = new ReminderManager(_settings, _oauth, Dispatcher);
