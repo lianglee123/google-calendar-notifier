@@ -1,5 +1,9 @@
 # Gmail Calendar Notifier
 
+[![build](https://github.com/khensler/gcal-notifier/actions/workflows/build.yml/badge.svg)](https://github.com/khensler/gcal-notifier/actions/workflows/build.yml)
+
+**⬇️ [Download the latest build](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)** — a single self-contained `.exe`, no install required.
+
 An **Outlook-style reminder app for Google Calendar on Windows**. It lives in the system
 tray, quietly polls your calendar, and pops an always-on-top reminder window at each
 event's reminder time — with **Snooze** and **Dismiss**, just like Outlook's classic
@@ -32,8 +36,9 @@ so simple `.ics` subscriptions don't work).
 
 ## Install (for users)
 
-1. Get `GmailCalendarNotifier.exe` — from the project's **Releases** page if one is
-   published, or build it yourself (see [Build from source](#build-from-source)).
+1. **[Download `GmailCalendarNotifier.exe`](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)**
+   (self-contained, no .NET install needed). It's rebuilt automatically from every push to
+   `main`. Or build it yourself (see [Build from source](#build-from-source)).
 2. Double-click it. Because the app is not code-signed, **Windows SmartScreen may warn**
    ("Windows protected your PC") — click **More info → Run anyway**. Some antivirus may also
    prompt on a large single-file exe.
