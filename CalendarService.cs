@@ -200,8 +200,10 @@ public class CalendarService
 
                 foreach (var occ in occurrences)
                 {
-                    DateTime start = occ.Period.StartTime.AsSystemLocal;
-                    DateTime end = occ.Period.EndTime?.AsSystemLocal ?? start;
+                    // Convert via UTC to the machine's local zone. AsSystemLocal does NOT convert
+                    // from the event's own time zone, so it would show the source wall-clock.
+                    DateTime start = occ.Period.StartTime.AsUtc.ToLocalTime();
+                    DateTime end = occ.Period.EndTime?.AsUtc.ToLocalTime() ?? start;
                     if (end < now) continue;
 
                     var key = $"{ev.Uid}|{start:o}";
