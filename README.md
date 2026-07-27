@@ -2,7 +2,9 @@
 
 [![build](https://github.com/khensler/gcal-notifier/actions/workflows/build.yml/badge.svg)](https://github.com/khensler/gcal-notifier/actions/workflows/build.yml)
 
-**⬇️ [Download the latest build](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)** — a single self-contained `.exe`, no install required.
+**⬇️ Download** — a single self-contained `.exe`, no install required:
+[latest stable release](https://github.com/khensler/gcal-notifier/releases/latest) ·
+[newest dev build](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)
 
 An **Outlook-style reminder app for Google Calendar on Windows**. It lives in the system
 tray, quietly polls your calendar, and pops an always-on-top reminder window at each
@@ -83,6 +85,22 @@ dotnet publish -c Release -r win-x64 --self-contained false `
 
 The exe lands in the output folder (`publish\` or `publish-fd\`). Distribute just that one
 `.exe` — not the `.pdb`.
+
+### Releases (maintainers)
+
+Two channels are produced by GitHub Actions:
+
+- **Newest dev build** — every push to `main` updates the rolling `latest` prerelease
+  ([`build` workflow](.github/workflows/build.yml)).
+- **Stable versioned release** — pushing a `vX.Y.Z` tag builds and publishes a normal release
+  with that version stamped into the exe ([`release` workflow](.github/workflows/release.yml)):
+
+  ```powershell
+  git tag v1.0.0
+  git push origin v1.0.0
+  ```
+
+  The **latest stable release** link above resolves to the newest of these.
 
 ---
 
