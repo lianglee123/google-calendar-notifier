@@ -1,0 +1,212 @@
+# Gmail Calendar Notifier
+
+An **Outlook-style reminder app for Google Calendar on Windows**. It lives in the system
+tray, quietly polls your calendar, and pops an always-on-top reminder window at each
+event's reminder time — with **Snooze** and **Dismiss**, just like Outlook's classic
+reminder popup.
+
+It's built for the case where you use Google Calendar on Windows but don't run the Google
+Calendar web app all day (or your organization has locked down the "secret iCal address",
+so simple `.ics` subscriptions don't work).
+
+## Features
+
+- 🔔 Always-on-top reminder popup, centered on your primary screen, with a sound.
+- ⏰ Honors each event's own reminder time, or a default lead time you choose.
+- 💤 Snooze (1 min → 1 day) and Dismiss / Dismiss All, per reminder or all at once.
+- 🔗 **Open in Calendar** button on each reminder, plus a **Join meeting** link when the
+  event has a Meet/Zoom/Teams URL (in the location or description).
+- 🔁 Recurring events handled correctly.
+- 🚀 Optional launch at Windows startup.
+- 🔒 Two sign-in methods: a built-in client (no setup) or your own Google OAuth client.
+
+## Requirements
+
+- Windows 10 or 11 (x64).
+- A Google Calendar account.
+- For the **self-contained** download: nothing else.
+- For the **small** download or building from source: the
+  [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (Desktop, x64).
+
+---
+
+## Install (for users)
+
+1. Get `GmailCalendarNotifier.exe` — from the project's **Releases** page if one is
+   published, or build it yourself (see [Build from source](#build-from-source)).
+2. Double-click it. Because the app is not code-signed, **Windows SmartScreen may warn**
+   ("Windows protected your PC") — click **More info → Run anyway**. Some antivirus may also
+   prompt on a large single-file exe.
+3. On first launch the **Settings** window opens. Click **Sign in with Google** and approve
+   access in your browser. (See [Sign-in methods](#sign-in-methods) for the options.)
+4. Click **Save**. The app minimizes to the system tray and starts reminding you. Tick
+   **Start automatically when Windows starts** if you want it always running.
+
+There's no installer — it's a single portable `.exe`. To "uninstall", just delete it and the
+`%APPDATA%\GmailCalendarNotifier` folder.
+
+---
+
+## Build from source
+
+Requires the **.NET 8 SDK**.
+
+```powershell
+git clone <your-repo-url>
+cd gmail-notifier
+dotnet build
+dotnet run          # run it directly
+```
+
+### Produce a distributable .exe
+
+**Self-contained** — one file, ~155 MB, runs on any Windows 10/11 x64 machine with **no .NET
+install required**. This is the easiest thing to hand to someone else:
+
+```powershell
+dotnet publish -c Release -r win-x64 --self-contained true `
+  -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o publish
+```
+
+**Framework-dependent** — one file, ~1 MB, but the target machine needs the **.NET 8 Desktop
+Runtime** installed:
+
+```powershell
+dotnet publish -c Release -r win-x64 --self-contained false `
+  -p:PublishSingleFile=true -o publish-fd
+```
+
+The exe lands in the output folder (`publish\` or `publish-fd\`). Distribute just that one
+`.exe` — not the `.pdb`.
+
+---
+
+## Usage
+
+The app runs from the **system tray**. Right-click the tray icon for:
+
+- **Show reminders** — bring the reminder window up now (or tell you what's next).
+- **Refresh now** — re-sync with Google immediately.
+- **Settings…** — sign in/out and change options.
+- **Exit**.
+
+### Reminder window
+
+- Reminders appear at their reminder time, centered and on top, with a sound.
+- Select one or more reminders (Ctrl/Shift-click), pick a snooze interval, and **Snooze** —
+  or **Dismiss** them. With nothing selected, the buttons act on all shown reminders.
+- **Dismiss All** clears everything.
+- **Open in Calendar** opens that event in the Google Calendar web UI. **Join meeting** opens
+  the meeting link in your browser when the event has one.
+- Closing the window (X) just hides it; pending reminders stay scheduled.
+
+---
+
+## Sign-in methods
+
+Choose in **Settings → Sign-in method**. Both use Google's OAuth with a PKCE + loopback flow
+and store only a refresh token (see [Privacy](#privacy--how-it-works)).
+
+| Method | Setup required | Reads calendar via |
+|---|---|---|
+| **Built-in client** (default) | None | CalDAV |
+| **My own Google OAuth client** | Create a Desktop OAuth client (below) | Calendar REST API |
+
+**Built-in client** signs in exactly the way Mozilla Thunderbird does, using Thunderbird's
+public installed-app credential. Pick this if your organization already permits Thunderbird —
+no Google Cloud access needed.
+
+**My own Google OAuth client** is for when you'd rather not rely on a shared credential, or the
+built-in client isn't permitted in your environment. To set one up:
+
+1. Go to the [Google Cloud Console](https://console.cloud.google.com/) and create (or pick) a project.
+2. **APIs & Services → Library** → enable **Google Calendar API**.
+3. **APIs & Services → OAuth consent screen** → configure it (External is fine; add your own
+   Google account as a Test user).
+4. **APIs & Services → Credentials → Create credentials → OAuth client ID** → Application
+   type **Desktop app**.
+5. Copy the **Client ID** and **Client secret** into the app's Settings, select **My own
+   Google OAuth client**, and **Save**.
+
+Switching methods (or editing the client id/secret) signs you out so you can re-authorize with
+the new client.
+
+---
+
+## Settings
+
+Stored at `%APPDATA%\GmailCalendarNotifier\settings.json` (editable in the app; the table is
+for reference).
+
+| Setting | Meaning |
+|---|---|
+| `DefaultReminderMinutes` | Minutes before start to remind, when an event has no reminder of its own. |
+| `PollIntervalMinutes` | How often to re-sync with Google (minimum 1). |
+| `UseEventAlarms` | Honor each event's own reminder time when present; otherwise always use the default. |
+| `PlaySound` | Play a sound when a reminder pops. |
+| `RunAtStartup` | Launch at Windows login (per-user `Run` registry key). |
+| `AccountEmail` | Display only — the signed-in account. |
+| `UseCustomOAuthClient` | `false` = built-in client + CalDAV; `true` = your own client + REST API. |
+| `OAuthClientId` / `OAuthClientSecret` | Your desktop OAuth client's credentials (used when `UseCustomOAuthClient` is true). |
+
+---
+
+## Privacy & how it works
+
+- Sign-in uses Google OAuth with **PKCE + a loopback redirect** to a temporary `localhost`
+  port — no client secret is ever exposed to the browser.
+- Only a **refresh token** is stored, **encrypted with Windows DPAPI** (readable only by your
+  Windows account on this machine), at `%APPDATA%\GmailCalendarNotifier\token.dat`. It's never
+  written to `settings.json`. **Sign out** in Settings deletes it.
+- The app requests calendar access and **only ever reads** — it never modifies your calendar.
+- **Built-in mode** reads over **CalDAV** (`apidata.googleusercontent.com/caldav/v2`), the same
+  transport Thunderbird uses, and expands recurrences/reminders locally.
+  **Custom mode** reads via the **Google Calendar REST API**.
+- No data leaves your machine except the direct requests to Google.
+
+> **About the built-in credential:** the OAuth client id/secret compiled into the app is
+> Thunderbird's public *installed-app* credential, published in Mozilla's open-source tree and
+> shipped in every Thunderbird build. For an installed app this "secret" is not confidential
+> (PKCE is what secures the flow), so it is safe to include in source. This project is not
+> affiliated with or endorsed by Mozilla or Google.
+
+---
+
+## Notes & limitations
+
+- **Built-in (CalDAV) mode** reads your **primary** calendar. **Custom (REST) mode** reads all
+  calendars you have visible ("selected") in Google Calendar.
+- All-day events are intentionally skipped (a timed popup doesn't map cleanly to them).
+- Reminders honor per-event overrides; when an event uses the calendar's *default* reminder,
+  the app's `DefaultReminderMinutes` is used instead.
+- Times are shown in your local time zone.
+
+## Troubleshooting
+
+- **"Access blocked" / a Google error page during sign-in** — your organization doesn't permit
+  the built-in (Thunderbird) client. Switch to **My own Google OAuth client** in Settings.
+- **App won't start (small build)** — install the
+  [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0), or use the
+  self-contained build.
+- **Nothing pops but a meeting is soon** — reminders fire at the reminder time (e.g. 10 min
+  before), not immediately. Right-click the tray icon → **Show reminders** to see what's next.
+- **Logs** — `%APPDATA%\GmailCalendarNotifier\log.txt` records sign-in and sync activity, and
+  any unexpected errors. **Open log** is also on the Settings window.
+
+## Project structure
+
+| File | Responsibility |
+|---|---|
+| `App.xaml(.cs)` | Startup, tray icon, wiring, global error logging. |
+| `OAuthService.cs` | Google OAuth (PKCE + loopback), token refresh. |
+| `TokenStore.cs` | DPAPI-encrypted refresh-token storage. |
+| `CaldavClient.cs` | CalDAV discovery + event query (built-in mode). |
+| `CalendarService.cs` | Fetch + parse events (CalDAV and REST paths). |
+| `ReminderManager.cs` | Poll timer, reminder scheduling, snooze/dismiss state. |
+| `ReminderWindow.xaml(.cs)` | The reminder popup. |
+| `SettingsWindow.xaml(.cs)` | Sign-in and options UI. |
+| `AppSettings.cs` | Settings model + JSON persistence. |
+
+## License
+
+[MIT](LICENSE) © 2026 Kenyon Hensler

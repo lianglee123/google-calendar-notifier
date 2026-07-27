@@ -1,0 +1,42 @@
+# Build output
+bin/
+obj/
+[Bb]in/
+[Oo]bj/
+
+# Publish output (includes large self-contained exe)
+publish/
+publish-fd/
+[Pp]ublish/
+*.publish.xml
+
+# Visual Studio / Rider / VS Code
+.vs/
+.vscode/
+.idea/
+*.user
+*.suo
+*.userprefs
+*.DotSettings.user
+
+# Build / restore artifacts
+*.dll
+*.exe
+*.pdb
+project.lock.json
+artifacts/
+
+# NuGet
+*.nupkg
+packages/
+
+# OS cruft
+Thumbs.db
+Desktop.ini
+.DS_Store
+
+# App runtime data lives in %APPDATA%\GmailCalendarNotifier (token.dat, settings.json,
+# log.txt) — outside the repo — but ignore copies if any ever land here.
+token.dat
+settings.json
+log.txt

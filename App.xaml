@@ -1,0 +1,8 @@
+<Application x:Class="GmailCalendarNotifier.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:GmailCalendarNotifier">
+    <Application.Resources>
+        <local:EmptyToCollapsedConverter x:Key="EmptyToCollapsed"/>
+    </Application.Resources>
+</Application>

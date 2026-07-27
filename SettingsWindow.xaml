@@ -1,0 +1,90 @@
+<Window x:Class="GmailCalendarNotifier.SettingsWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Gmail Calendar Notifier — Settings"
+        Width="560" SizeToContent="Height"
+        WindowStartupLocation="CenterScreen"
+        ResizeMode="NoResize"
+        Background="#FFF3F3F3"
+        FontFamily="Segoe UI">
+    <StackPanel Margin="18">
+
+        <TextBlock Text="Google account" FontWeight="SemiBold" Margin="0,0,0,6"/>
+        <Border Background="White" BorderBrush="#FFD0D0D0" BorderThickness="1" CornerRadius="3" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" VerticalAlignment="Center">
+                    <TextBlock x:Name="AccountText" Text="Not signed in" FontWeight="SemiBold"/>
+                    <TextBlock Text="Uses the same OAuth sign-in as Thunderbird — no Google Cloud setup needed."
+                               Foreground="#FF666666" FontSize="11" TextWrapping="Wrap" Margin="0,2,0,0"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center">
+                    <Button x:Name="SignInButton" Content="Sign in with Google" Height="30"
+                            Padding="14,0" Margin="8,0,0,0" Click="SignIn_Click"/>
+                    <Button x:Name="SignOutButton" Content="Sign out" Height="30"
+                            Padding="12,0" Margin="8,0,0,0" Click="SignOut_Click" Visibility="Collapsed"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
+        <TextBlock Text="Sign-in method" FontWeight="SemiBold" Margin="0,16,0,6"/>
+        <Border Background="White" BorderBrush="#FFD0D0D0" BorderThickness="1" CornerRadius="3" Padding="12">
+            <StackPanel>
+                <RadioButton x:Name="BuiltInRadio" GroupName="OAuthMode" Content="Built-in client (like Thunderbird — no setup)"
+                             Checked="OAuthMode_Changed" Margin="0,0,0,4"/>
+                <RadioButton x:Name="CustomRadio" GroupName="OAuthMode" Content="My own Google OAuth client (advanced)"
+                             Checked="OAuthMode_Changed"/>
+                <StackPanel x:Name="CustomFields" Margin="20,8,0,0">
+                    <TextBlock Text="Client ID" FontSize="11" Foreground="#FF666666" Margin="0,0,0,2"/>
+                    <TextBox x:Name="ClientIdBox" Height="24" VerticalContentAlignment="Center" Margin="0,0,0,6"/>
+                    <TextBlock Text="Client secret" FontSize="11" Foreground="#FF666666" Margin="0,0,0,2"/>
+                    <TextBox x:Name="ClientSecretBox" Height="24" VerticalContentAlignment="Center"/>
+                    <TextBlock TextWrapping="Wrap" Foreground="#FF666666" FontSize="11" Margin="0,6,0,0">
+                        Create a "Desktop app" OAuth client in Google Cloud Console with the Google
+                        Calendar API enabled, then paste its Client ID and secret here. This mode reads
+                        your calendar via the standard REST API.
+                    </TextBlock>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+
+        <Grid Margin="0,16,0,0">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                <TextBlock Text="Default reminder (minutes before)" Margin="0,0,0,4"/>
+                <TextBox x:Name="ReminderBox" Height="26" VerticalContentAlignment="Center"/>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                <TextBlock Text="Check calendar every (minutes)" Margin="0,0,0,4"/>
+                <TextBox x:Name="PollBox" Height="26" VerticalContentAlignment="Center"/>
+            </StackPanel>
+        </Grid>
+
+        <CheckBox x:Name="UseAlarmsCheck" Content="Use each event's own reminder time when set"
+                  Margin="0,14,0,6"/>
+        <CheckBox x:Name="SoundCheck" Content="Play a sound when a reminder pops" Margin="0,0,0,6"/>
+        <CheckBox x:Name="StartupCheck" Content="Start automatically when Windows starts" Margin="0,0,0,14"/>
+
+        <TextBox x:Name="StatusLabel" Foreground="#FFC0392B" TextWrapping="Wrap" Margin="0,0,0,10"
+                 IsReadOnly="True" BorderThickness="0" Background="Transparent"
+                 MaxHeight="90" VerticalScrollBarVisibility="Auto"
+                 Visibility="Collapsed"/>
+
+        <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+            <Button x:Name="LogButton" Content="Open log" Height="30" Padding="12,0"
+                    Margin="0,0,8,0" Click="Log_Click"/>
+            <Button x:Name="TestButton" Content="Test connection" Height="30" Padding="14,0"
+                    Margin="0,0,8,0" Click="Test_Click"/>
+            <Button x:Name="SaveButton" Content="Save" Height="30" Padding="22,0"
+                    Margin="0,0,8,0" Click="Save_Click" IsDefault="True"/>
+            <Button x:Name="CancelButton" Content="Close" Height="30" Padding="14,0"
+                    Click="Cancel_Click" IsCancel="True"/>
+        </StackPanel>
+    </StackPanel>
+</Window>
