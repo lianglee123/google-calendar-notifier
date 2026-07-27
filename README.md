@@ -2,7 +2,7 @@
 
 [![build](https://github.com/khensler/gcal-notifier/actions/workflows/build.yml/badge.svg)](https://github.com/khensler/gcal-notifier/actions/workflows/build.yml)
 
-**⬇️ Download** — a single self-contained `.exe`, no install required:
+**⬇️ Download** — a single `.exe` (requires the [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)):
 [latest stable release](https://github.com/khensler/gcal-notifier/releases/latest) ·
 [newest dev build](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)
 
@@ -30,23 +30,26 @@ so simple `.ics` subscriptions don't work).
 
 - Windows 10 or 11 (x64).
 - A Google Calendar account.
-- For the **self-contained** download: nothing else.
-- For the **small** download or building from source: the
-  [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (Desktop, x64).
+- The [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) (Desktop, x64) —
+  needed to run the download and to build from source. Install it with
+  `winget install Microsoft.DotNet.DesktopRuntime.8`, or from the link above. If it's missing,
+  the app shows a dialog with a download link on first launch.
 
 ---
 
 ## Install (for users)
 
-1. **[Download `GmailCalendarNotifier.exe`](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)**
-   (self-contained, no .NET install needed). It's rebuilt automatically from every push to
-   `main`. Or build it yourself (see [Build from source](#build-from-source)).
-2. Double-click it. Because the app is not code-signed, **Windows SmartScreen may warn**
+1. Make sure the **[.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)**
+   is installed (`winget install Microsoft.DotNet.DesktopRuntime.8`).
+2. **[Download `GmailCalendarNotifier.exe`](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)**
+   — a ~1 MB single file, rebuilt automatically from every push to `main`. Or build it yourself
+   (see [Build from source](#build-from-source)).
+3. Double-click it. Because the app is not code-signed, **Windows SmartScreen may warn**
    ("Windows protected your PC") — click **More info → Run anyway**. Some antivirus may also
-   prompt on a large single-file exe.
-3. On first launch the **Settings** window opens. Click **Sign in with Google** and approve
+   prompt.
+4. On first launch the **Settings** window opens. Click **Sign in with Google** and approve
    access in your browser. (See [Sign-in methods](#sign-in-methods) for the options.)
-4. Click **Save**. The app minimizes to the system tray and starts reminding you. Tick
+5. Click **Save**. The app minimizes to the system tray and starts reminding you. Tick
    **Start automatically when Windows starts** if you want it always running.
 
 There's no installer — it's a single portable `.exe`. To "uninstall", just delete it and the

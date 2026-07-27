@@ -28,10 +28,12 @@ jobs:
       - name: Build
         run: dotnet build -c Release --no-restore
 
-      - name: Publish self-contained single-file exe
+      # Framework-dependent single-file exe (~1 MB). Requires the .NET 8 Desktop Runtime
+      # installed on the target machine.
+      - name: Publish framework-dependent single-file exe
         run: >
-          dotnet publish -c Release -r win-x64 --self-contained true
-          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          dotnet publish -c Release -r win-x64 --self-contained false
+          -p:PublishSingleFile=true
           -o publish
 
       - name: Upload build artifact
