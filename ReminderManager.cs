@@ -28,6 +28,10 @@ public class ReminderManager
     /// <summary>Raised with a human-readable status after each poll (for the tray tooltip).</summary>
     public event Action<string>? StatusChanged;
 
+    /// <summary>Raised when the stored Google authorization was rejected and user action in
+    /// Settings is required (raised on every failed poll until it is fixed).</summary>
+    public event Action<string>? AuthFailed;
+
     public ReminderManager(AppSettings settings, OAuthService oauth, Dispatcher dispatcher)
     {
         _settings = settings;
@@ -93,6 +97,11 @@ public class ReminderManager
 
             StatusChanged?.Invoke($"Last synced {DateTime.Now:t} — {_known.Count} upcoming.");
             Tick();
+        }
+        catch (AuthFailedException ex)
+        {
+            StatusChanged?.Invoke($"Authorization failed: {ex.Message}");
+            AuthFailed?.Invoke(ex.Message);
         }
         catch (Exception ex)
         {

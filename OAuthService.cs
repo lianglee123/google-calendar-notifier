@@ -9,6 +9,17 @@ using System.Text.Json;
 namespace GmailCalendarNotifier;
 
 /// <summary>
+/// The stored refresh token was rejected by Google (revoked access, password change, blocked
+/// client, …). Only fixable by the user re-authorizing in Settings, so the app surfaces it
+/// instead of silently stopping syncs. Network problems do NOT throw this — they surface as
+/// HttpRequestException/TaskCanceledException instead.
+/// </summary>
+public class AuthFailedException : InvalidOperationException
+{
+    public AuthFailedException(string message) : base(message) { }
+}
+
+/// <summary>
 /// Google OAuth2 for an installed (desktop) app: PKCE + loopback redirect, exactly the style
 /// Thunderbird uses. Holds a short-lived access token in memory and refreshes it from the
 /// DPAPI-persisted refresh token as needed.
@@ -184,13 +195,23 @@ public class OAuthService
         using var resp = await Http.PostAsync(TokenEndpoint, new FormUrlEncodedContent(form), ct);
         var body = await resp.Content.ReadAsStringAsync(ct);
         if (!resp.IsSuccessStatusCode)
-            throw new InvalidOperationException(
-                $"Could not refresh access ({(int)resp.StatusCode}). You may need to sign in again. {body}");
+        {
+            var msg =
+                $"Could not refresh access ({(int)resp.StatusCode}). You may need to sign in again. {body}";
+            // Any 4xx means Google rejected the request itself (bad/revoked token, wrong
+            // client secret, access blocked) — user action in Settings is required.
+            // 5xx / transport errors are transient and must NOT trigger the re-auth prompt.
+            throw IsClientError(resp.StatusCode)
+                ? new AuthFailedException(msg)
+                : new InvalidOperationException(msg);
+        }
 
         using var doc = JsonDocument.Parse(body);
         CacheAccessToken(doc.RootElement);
         return _accessToken!;
     }
+
+    private static bool IsClientError(HttpStatusCode status) => (int)status is >= 400 and <= 499;
 
     private void CacheAccessToken(JsonElement root)
     {

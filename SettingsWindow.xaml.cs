@@ -9,7 +9,7 @@ public partial class SettingsWindow : Window
     private readonly AppSettings _settings;
     private readonly OAuthService _oauth;
 
-    public SettingsWindow(AppSettings settings, OAuthService oauth)
+    public SettingsWindow(AppSettings settings, OAuthService oauth, string? alertMessage = null)
     {
         InitializeComponent();
         _settings = settings;
@@ -29,6 +29,9 @@ public partial class SettingsWindow : Window
         UpdateCustomFieldsVisibility();
 
         UpdateAccountUi();
+
+        if (!string.IsNullOrEmpty(alertMessage))
+            SetStatus(alertMessage, Colors.Firebrick);
     }
 
     private void OAuthMode_Changed(object sender, RoutedEventArgs e) => UpdateCustomFieldsVisibility();

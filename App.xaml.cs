@@ -65,6 +65,13 @@ public partial class App : System.Windows.Application
         {
             if (_tray != null) _tray.Text = Truncate("Gmail Calendar Notifier\n" + status, 127);
         };
+        // Authorization revoked/broken → open Settings so the user re-authorizes instead of
+        // silently missing meetings. Raised on every failed poll; while the Settings dialog is
+        // open the dispatcher is blocked, so the dialog pops again after being closed if the
+        // problem is still there.
+        _manager.AuthFailed += message => ShowSettings(
+            "Google authorization is no longer working — sign in again to keep receiving " +
+            "reminders.\n\n" + message);
 
         // First run: not signed in yet → open settings so the user can sign in.
         if (!_settings.IsSignedIn)
@@ -176,9 +183,9 @@ public partial class App : System.Windows.Application
         _tray?.ShowBalloonTip(6000, "Gmail Calendar Notifier", msg, WinForms.ToolTipIcon.Info);
     }
 
-    private bool ShowSettings()
+    private bool ShowSettings(string? alert = null)
     {
-        var win = new SettingsWindow(_settings, _oauth!) { Topmost = true };
+        var win = new SettingsWindow(_settings, _oauth!, alert) { Topmost = true };
         bool? result = win.ShowDialog();
         if (result == true)
         {

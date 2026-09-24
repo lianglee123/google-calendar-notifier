@@ -35,6 +35,10 @@ original project:
   using 125%/150% scaling (physical pixels vs. WPF DIPs are converted via `GetDpiForMonitor`,
   see the new `ScreenDpi.cs` helper).
 - **Snooze default** — the default snooze interval is now **1 minute** (was 5).
+- **Auth-failure alert** — if your Google authorization stops working (e.g. you revoke the
+  app's access or change your password), the app opens the Settings window asking you to sign
+  in again instead of silently stopping syncs. If you close Settings without fixing it, the
+  window pops again on the next failed sync. Network errors do not trigger the prompt.
 
 ## Features
 
