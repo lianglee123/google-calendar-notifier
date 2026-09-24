@@ -22,6 +22,9 @@ public class AppSettings
     /// <summary>Play a sound when a reminder pops.</summary>
     public bool PlaySound { get; set; } = true;
 
+    /// <summary>Show the reminder popup on every monitor (vs. only the primary one).</summary>
+    public bool ShowOnAllMonitors { get; set; } = true;
+
     /// <summary>Start automatically when Windows starts (managed via Run registry key).</summary>
     public bool RunAtStartup { get; set; } = false;
 

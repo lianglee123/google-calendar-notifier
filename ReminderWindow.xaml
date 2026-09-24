@@ -3,7 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:local="clr-namespace:GmailCalendarNotifier"
         Title="Reminders"
-        Width="440" MinHeight="240" SizeToContent="Height"
+        Width="560" MinHeight="300" SizeToContent="Height"
         WindowStartupLocation="Manual"
         ShowInTaskbar="True"
         Topmost="True"
@@ -31,7 +31,7 @@
 
         <!-- Reminder list -->
         <Border Grid.Row="1" Background="White" BorderBrush="#FFD0D0D0"
-                BorderThickness="1" CornerRadius="3" MaxHeight="300">
+                BorderThickness="1" CornerRadius="3" MaxHeight="420">
             <ListBox x:Name="ReminderList" BorderThickness="0" Background="Transparent"
                      SelectionMode="Extended"
                      ScrollViewer.HorizontalScrollBarVisibility="Disabled"
@@ -95,11 +95,11 @@
                 <ColumnDefinition Width="Auto"/>
             </Grid.ColumnDefinitions>
             <Button x:Name="DismissAllButton" Grid.Column="0" Content="Dismiss All"
-                    Height="30" Padding="12,0" Click="DismissAll_Click"/>
+                    Height="34" Padding="14,0" Click="DismissAll_Click"/>
             <Button x:Name="SnoozeButton" Grid.Column="2" Content="Snooze"
-                    Height="30" Padding="18,0" Margin="0,0,8,0" Click="Snooze_Click"/>
+                    Height="34" Padding="22,0" Margin="0,0,8,0" Click="Snooze_Click"/>
             <Button x:Name="DismissButton" Grid.Column="3" Content="Dismiss"
-                    Height="30" Padding="18,0" Click="Dismiss_Click"/>
+                    Height="34" Padding="22,0" Click="Dismiss_Click"/>
         </Grid>
     </Grid>
 </Window>

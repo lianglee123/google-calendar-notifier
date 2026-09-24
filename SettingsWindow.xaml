@@ -69,6 +69,7 @@
         <CheckBox x:Name="UseAlarmsCheck" Content="Use each event's own reminder time when set"
                   Margin="0,14,0,6"/>
         <CheckBox x:Name="SoundCheck" Content="Play a sound when a reminder pops" Margin="0,0,0,6"/>
+        <CheckBox x:Name="AllMonitorsCheck" Content="Show the reminder on all monitors" Margin="0,0,0,6"/>
         <CheckBox x:Name="StartupCheck" Content="Start automatically when Windows starts" Margin="0,0,0,14"/>
 
         <TextBox x:Name="StatusLabel" Foreground="#FFC0392B" TextWrapping="Wrap" Margin="0,0,0,10"

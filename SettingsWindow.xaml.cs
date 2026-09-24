@@ -19,6 +19,7 @@ public partial class SettingsWindow : Window
         PollBox.Text = settings.PollIntervalMinutes.ToString();
         UseAlarmsCheck.IsChecked = settings.UseEventAlarms;
         SoundCheck.IsChecked = settings.PlaySound;
+        AllMonitorsCheck.IsChecked = settings.ShowOnAllMonitors;
         StartupCheck.IsChecked = settings.RunAtStartup;
 
         CustomRadio.IsChecked = settings.UseCustomOAuthClient;
@@ -102,6 +103,7 @@ public partial class SettingsWindow : Window
         _settings.PollIntervalMinutes = Math.Max(1, ParseInt(PollBox.Text, _settings.PollIntervalMinutes));
         _settings.UseEventAlarms = UseAlarmsCheck.IsChecked == true;
         _settings.PlaySound = SoundCheck.IsChecked == true;
+        _settings.ShowOnAllMonitors = AllMonitorsCheck.IsChecked == true;
         _settings.RunAtStartup = StartupCheck.IsChecked == true;
 
         // Detect a change to the OAuth client — if it changed, the stored token is for the old

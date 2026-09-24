@@ -1,13 +1,13 @@
-using System.Media;
 using System.Windows;
 using System.Windows.Threading;
+using WinForms = System.Windows.Forms;
 
 namespace GmailCalendarNotifier;
 
 public partial class ReminderWindow : Window
 {
     private readonly ReminderManager _manager;
-    private readonly AppSettings _settings;
+    private readonly WinForms.Screen _screen;
     private readonly DispatcherTimer _refreshTimer;
 
     // Snooze choices, in minutes.
@@ -23,11 +23,13 @@ public partial class ReminderWindow : Window
         ("1 day", 1440),
     };
 
-    public ReminderWindow(ReminderManager manager, AppSettings settings)
+    public bool ForceClose { get; set; }
+
+    public ReminderWindow(ReminderManager manager, WinForms.Screen screen)
     {
         InitializeComponent();
         _manager = manager;
-        _settings = settings;
+        _screen = screen;
 
         ReminderList.ItemsSource = _manager.Active;
         _manager.Active.CollectionChanged += (_, _) => UpdateHeader();
@@ -40,8 +42,10 @@ public partial class ReminderWindow : Window
         _refreshTimer.Tick += (_, _) => RefreshTexts();
         _refreshTimer.Start();
 
-        // Closing the window just hides it — reminders stay pending.
-        Closing += (e, args) => { args.Cancel = true; HideWindow(); };
+        // Reminders must be acted on (Snooze/Dismiss) before the popup can go away —
+        // user Close is not allowed, otherwise the modal overlay would trap the user
+        // with no visible popup. The App sets ForceClose when tearing the popups down.
+        Closing += (e, args) => args.Cancel = !ForceClose;
     }
 
     private void RefreshTexts()
@@ -56,7 +60,7 @@ public partial class ReminderWindow : Window
         if (ReminderList.SelectedIndex < 0 && n > 0) ReminderList.SelectedIndex = 0;
     }
 
-    /// <summary>Pop the window to the front, centered on the primary screen, and play the sound.</summary>
+    /// <summary>Pop the window to the front, centered on this window's screen.</summary>
     public void PopUp()
     {
         RefreshTexts();
@@ -65,15 +69,10 @@ public partial class ReminderWindow : Window
         Show();
         if (WindowState == WindowState.Minimized) WindowState = WindowState.Normal;
         // Center after Show so the size (SizeToContent height) is known.
-        CenterOnPrimary();
+        CenterOnScreen();
         Topmost = true;
         Activate();
         Focus();
-
-        if (_settings.PlaySound)
-        {
-            try { SystemSounds.Exclamation.Play(); } catch { /* ignore */ }
-        }
     }
 
     public void HideWindow() => Hide();
@@ -102,10 +101,10 @@ public partial class ReminderWindow : Window
         catch { /* ignore */ }
     }
 
-    private void CenterOnPrimary()
+    private void CenterOnScreen()
     {
-        // Primary screen's work area (excludes the taskbar).
-        var area = SystemParameters.WorkArea;
+        // This screen's work area (excludes the taskbar).
+        var area = _screen.WorkingArea;
         double w = ActualWidth > 0 ? ActualWidth : Width;
         double h = ActualHeight > 0 ? ActualHeight : Height;
         Left = area.Left + (area.Width - w) / 2;

@@ -1,5 +1,6 @@
 using System.Windows;
 using System.Drawing;
+using System.Media;
 using WinForms = System.Windows.Forms;
 using MessageBox = System.Windows.MessageBox;
 
@@ -12,7 +13,9 @@ public partial class App : System.Windows.Application
     private AppSettings _settings = new();
     private OAuthService? _oauth;
     private ReminderManager? _manager;
-    private ReminderWindow? _reminderWindow;
+    // One popup + one modal overlay per monitor; created fresh on each popup so the
+    // set of monitors and the "all monitors" setting are always honored.
+    private readonly List<(ReminderWindow Window, ModalOverlayWindow Overlay)> _popups = new();
 
     protected override void OnStartup(StartupEventArgs e)
     {
@@ -52,12 +55,11 @@ public partial class App : System.Windows.Application
         SetupTray();
 
         _manager = new ReminderManager(_settings, _oauth, Dispatcher);
-        _reminderWindow = new ReminderWindow(_manager, _settings);
 
         _manager.ActiveChanged += active =>
         {
-            if (active) _reminderWindow!.PopUp();
-            else _reminderWindow!.HideWindow();
+            if (active) PopUpReminders();
+            else HideReminders();
         };
         _manager.StatusChanged += status =>
         {
@@ -92,13 +94,63 @@ public partial class App : System.Windows.Application
         _tray.DoubleClick += (_, _) => ShowReminders();
     }
 
+    /// <summary>
+    /// Create one reminder window (behind a full-screen modal overlay) per monitor —
+    /// or just the primary monitor when the setting is off — and pop them all.
+    /// All windows bind the same collection, so acting on one updates them all.
+    /// </summary>
+    private void PopUpReminders()
+    {
+        if (_manager == null) return;
+
+        HideReminders(); // rebuild in case monitors or the setting changed
+
+        var primary = WinForms.Screen.PrimaryScreen ?? WinForms.Screen.AllScreens[0];
+        var screens = _settings.ShowOnAllMonitors
+            ? WinForms.Screen.AllScreens
+            : new[] { primary };
+
+        foreach (var screen in screens)
+        {
+            var window = new ReminderWindow(_manager, screen);
+            var overlay = new ModalOverlayWindow(screen, window);
+            _popups.Add((window, overlay));
+        }
+
+        // Show overlays first, then the popups (owned windows render above their owner),
+        // then bring the primary one to the front.
+        foreach (var (_, overlay) in _popups) overlay.Show();
+        foreach (var (window, _) in _popups) window.PopUp();
+        _popups[0].Window.Activate();
+
+        if (_settings.PlaySound)
+        {
+            try { SystemSounds.Exclamation.Play(); } catch { /* ignore */ }
+        }
+    }
+
+    private void HideReminders()
+    {
+        foreach (var (window, overlay) in _popups)
+        {
+            try
+            {
+                window.ForceClose = true;
+                window.Close();
+            }
+            catch { /* ignore */ }
+            try { overlay.Close(); } catch { /* ignore */ }
+        }
+        _popups.Clear();
+    }
+
     private void ShowReminders()
     {
-        if (_reminderWindow == null || _manager == null) return;
+        if (_manager == null) return;
 
         if (_manager.Active.Count > 0)
         {
-            _reminderWindow.PopUp();
+            PopUpReminders();
             return;
         }
 
@@ -134,6 +186,7 @@ public partial class App : System.Windows.Application
     private void ExitApp()
     {
         _manager?.Stop();
+        HideReminders();
         if (_tray != null) { _tray.Visible = false; _tray.Dispose(); }
         Shutdown();
     }
