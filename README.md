@@ -256,4 +256,4 @@ for reference).
 
 ## License
 
-[MIT](LICENSE) © 2026 joy.li
+[MIT](LICENSE) © 2026 Kenyon Hensler & joy.li
