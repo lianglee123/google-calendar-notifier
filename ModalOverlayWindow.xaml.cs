@@ -20,11 +20,14 @@ public partial class ModalOverlayWindow : Window
         InitializeComponent();
         _popup = popup;
 
+        // Cover the work area exactly — convert physical pixels to WPF DIPs first.
         var area = screen.WorkingArea;
-        Left = area.Left;
-        Top = area.Top;
-        Width = area.Width;
-        Height = area.Height;
+        double sx = ScreenDpi.ScaleX(screen);
+        double sy = ScreenDpi.ScaleY(screen);
+        Left = area.Left / sx;
+        Top = area.Top / sy;
+        Width = area.Width / sx;
+        Height = area.Height / sy;
     }
 
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)

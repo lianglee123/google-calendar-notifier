@@ -103,12 +103,14 @@ public partial class ReminderWindow : Window
 
     private void CenterOnScreen()
     {
-        // This screen's work area (excludes the taskbar).
+        // This screen's work area, converted from physical pixels to WPF DIPs.
         var area = _screen.WorkingArea;
+        double sx = ScreenDpi.ScaleX(_screen);
+        double sy = ScreenDpi.ScaleY(_screen);
         double w = ActualWidth > 0 ? ActualWidth : Width;
         double h = ActualHeight > 0 ? ActualHeight : Height;
-        Left = area.Left + (area.Width - w) / 2;
-        Top = area.Top + (area.Height - h) / 2;
+        Left = area.Left / sx + (area.Width / sx - w) / 2;
+        Top = area.Top / sy + (area.Height / sy - h) / 2;
     }
 
     private int SelectedSnoozeMinutes()
