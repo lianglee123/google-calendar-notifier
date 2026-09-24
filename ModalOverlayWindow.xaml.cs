@@ -7,14 +7,18 @@ namespace GmailCalendarNotifier;
 /// <summary>
 /// Full-screen semi-transparent overlay shown behind the reminder popup on each monitor.
 /// Swallows all input so no other application can be used until the reminders are handled;
-/// clicking it pushes focus back to its owner (the reminder window).
+/// clicking it (or trying to switch away) pushes focus back to the popup.
+/// The popup window takes this overlay as its Owner, which keeps the popup rendered
+/// above the overlay (owned windows always render above their owner).
 /// </summary>
 public partial class ModalOverlayWindow : Window
 {
-    public ModalOverlayWindow(WinForms.Screen screen, Window owner)
+    private readonly ReminderWindow _popup;
+
+    public ModalOverlayWindow(WinForms.Screen screen, ReminderWindow popup)
     {
         InitializeComponent();
-        Owner = owner;
+        _popup = popup;
 
         var area = screen.WorkingArea;
         Left = area.Left;
@@ -26,13 +30,13 @@ public partial class ModalOverlayWindow : Window
     protected override void OnMouseLeftButtonDown(MouseButtonEventArgs e)
     {
         base.OnMouseLeftButtonDown(e);
-        Owner?.Activate();
+        _popup.Activate();
     }
 
     protected override void OnDeactivated(EventArgs e)
     {
         base.OnDeactivated(e);
         // Someone tried to switch away while reminders are pending — keep them in front.
-        if (Owner is { IsVisible: true }) Owner.Activate();
+        if (_popup.IsVisible) _popup.Activate();
     }
 }

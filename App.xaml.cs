@@ -117,10 +117,15 @@ public partial class App : System.Windows.Application
             _popups.Add((window, overlay));
         }
 
-        // Show overlays first, then the popups (owned windows render above their owner),
-        // then bring the primary one to the front.
-        foreach (var (_, overlay) in _popups) overlay.Show();
-        foreach (var (window, _) in _popups) window.PopUp();
+        // Show each overlay first, then make the popup its OWNED window — owned windows
+        // always render above their owner, so the popup stays on top of the dimmed
+        // overlay. (The reverse — overlay owning an unshown popup — throws at Show().)
+        foreach (var (window, overlay) in _popups)
+        {
+            overlay.Show();
+            window.Owner = overlay;
+            window.PopUp();
+        }
         _popups[0].Window.Activate();
 
         if (_settings.PlaySound)
