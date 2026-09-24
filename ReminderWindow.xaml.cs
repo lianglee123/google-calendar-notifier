@@ -35,7 +35,7 @@ public partial class ReminderWindow : Window
         _manager.Active.CollectionChanged += (_, _) => UpdateHeader();
 
         foreach (var opt in SnoozeOptions) SnoozeCombo.Items.Add(opt.Label);
-        SnoozeCombo.SelectedIndex = 1; // default 5 minutes
+        SnoozeCombo.SelectedIndex = 0; // default 1 minute
 
         // Live-update the "Due in X" countdown text.
         _refreshTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(15) };
@@ -116,7 +116,7 @@ public partial class ReminderWindow : Window
     private int SelectedSnoozeMinutes()
     {
         int idx = SnoozeCombo.SelectedIndex;
-        if (idx < 0 || idx >= SnoozeOptions.Length) idx = 1;
+        if (idx < 0 || idx >= SnoozeOptions.Length) idx = 0;
         return SnoozeOptions[idx].Minutes;
     }
 

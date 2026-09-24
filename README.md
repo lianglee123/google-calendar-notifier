@@ -1,10 +1,13 @@
 # Gmail Calendar Notifier
 
-[![build](https://github.com/khensler/gcal-notifier/actions/workflows/build.yml/badge.svg)](https://github.com/khensler/gcal-notifier/actions/workflows/build.yml)
+[![build](https://github.com/lianglee123/google-calendar-notifier/actions/workflows/build.yml/badge.svg)](https://github.com/lianglee123/google-calendar-notifier/actions/workflows/build.yml)
 
 **⬇️ Download** — a single `.exe` (requires the [.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)):
-[latest stable release](https://github.com/khensler/gcal-notifier/releases/latest) ·
-[newest dev build](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)
+[latest stable release](https://github.com/lianglee123/google-calendar-notifier/releases/latest) ·
+[newest dev build](https://github.com/lianglee123/google-calendar-notifier/releases/download/latest/GmailCalendarNotifier.exe)
+
+This project was born out of a simple need: I kept getting meeting times wrong. If you
+struggle with the same problem, I hope it helps you too.
 
 An **Outlook-style reminder app for Google Calendar on Windows**. It lives in the system
 tray, quietly polls your calendar, and pops an always-on-top reminder window at each
@@ -14,6 +17,24 @@ reminder popup.
 It's built for the case where you use Google Calendar on Windows but don't run the Google
 Calendar web app all day (or your organization has locked down the "secret iCal address",
 so simple `.ics` subscriptions don't work).
+
+## About this fork
+
+This is a fork of [khensler/gcal-notifier](https://github.com/khensler/gcal-notifier) (MIT),
+created because I kept getting meeting times wrong. Changes made in this fork, on top of the
+original project:
+
+- **Multi-monitor reminders** — the popup now appears on *every* monitor (toggleable in
+  Settings via **Show on all monitors**, on by default). Windows are created per monitor on
+  each popup, so hot-plugged displays and setting changes are picked up automatically.
+- **Modal overlay** — a full-screen, semi-transparent overlay on each monitor blocks input
+  to other apps until all reminders are snoozed or dismissed. Clicking an overlay
+  re-activates its reminder window, and closing the popup is no longer possible while
+  reminders are pending.
+- **Correct placement on scaled displays** — popups no longer end up off-screen on monitors
+  using 125%/150% scaling (physical pixels vs. WPF DIPs are converted via `GetDpiForMonitor`,
+  see the new `ScreenDpi.cs` helper).
+- **Snooze default** — the default snooze interval is now **1 minute** (was 5).
 
 ## Features
 
@@ -41,7 +62,7 @@ so simple `.ics` subscriptions don't work).
 
 1. Make sure the **[.NET 8 Desktop Runtime](https://dotnet.microsoft.com/download/dotnet/8.0)**
    is installed (`winget install Microsoft.DotNet.DesktopRuntime.8`).
-2. **[Download `GmailCalendarNotifier.exe`](https://github.com/khensler/gcal-notifier/releases/download/latest/GmailCalendarNotifier.exe)**
+2. **[Download `GmailCalendarNotifier.exe`](https://github.com/lianglee123/google-calendar-notifier/releases/download/latest/GmailCalendarNotifier.exe)**
    — a ~1 MB single file, rebuilt automatically from every push to `main`. Or build it yourself
    (see [Build from source](#build-from-source)).
 3. Double-click it. Because the app is not code-signed, **Windows SmartScreen may warn**
@@ -235,4 +256,4 @@ for reference).
 
 ## License
 
-[MIT](LICENSE) © 2026 Kenyon Hensler
+[MIT](LICENSE) © 2026 joy.li
